@@ -4,6 +4,8 @@ from datetime import datetime
 import os
 import csv
 import sys
+import ctypes
+
 
 
 
@@ -63,10 +65,18 @@ def capture_reseau(packet):
 
 def check_root():
     """Vérifie si le script est exécuté avec les privilèges root."""
-    if os.geteuid() != 0:
-        print("Ce programme doit être exécuté avec des privilèges root.")
-        sys.exit(1)
 
+    if os.name == 'nt':
+        # Windows
+        if not ctypes.windll.shell32.IsUserAnAdmin():
+            print("Ce script doit être exécuté en tant qu'administrateur.")
+            sys.exit(1)
+    else:
+        # Unix/Linux
+        if os.geteuid() != 0:
+            print("Ce script doit être exécuté en tant que root.")
+            sys.exit(1)
+    
 
 
 def main():
